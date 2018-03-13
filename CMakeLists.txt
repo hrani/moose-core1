@@ -400,7 +400,7 @@ set(EXTRA_ARGS "--prefix ${CMAKE_INSTALL_PREFIX} ${DISTUTILS_EXTRA_ARGS}")
 # On Debian/Ubuntu install using debian layout.
 # NOTE: Also create setup.cfg file which setup prefix and install-layout
 # suitable for DEBIAN systems.
-if(${_platform_desc} MATCHES ".*(Ubuntu|Debian).*")
+if(${_platform_desc} MATCHES ".*(Ubuntu|debian).*")
     list(APPEND EXTRA_ARGS "--install-layout=deb")
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/python/setup.cfg
          "[install]\nprefix=/usr\ninstall-layout=deb"
@@ -414,7 +414,11 @@ find_package(PythonInterp REQUIRED)
 if(NOT PYMOOSE_BDIST_DIR)
     set(PYMOOSE_BDIST_DIR ${CMAKE_BINARY_DIR}/bdist)
 endif( )
-set(PYMOOSE_BDIST_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/pymoose_bdist_install)
+
+# If no one hsa set the PYMOOSE bdist installation directory, use default.
+if(NOT PYMOOSE_BDIST_INSTALL_DIR)
+    set(PYMOOSE_BDIST_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/pymoose_bdist_install)
+endif()
 file(MAKE_DIRECTORY ${PYMOOSE_BDIST_INSTALL_DIR})
 
 # BDIST
@@ -451,20 +455,16 @@ add_custom_target(copy_pymoose DEPENDS ${PYTHON_SRCS}
 add_dependencies( bdist copy_pymoose )
 add_dependencies( copy_pymoose _moose )
 
-
 ######################### INSTALL ##############################################
 
 install(TARGETS moose.bin DESTINATION bin CONFIGURATIONS Debug)
-
 install(TARGETS libmoose DESTINATION lib CONFIGURATIONS Debug)
-
 install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/scripts/moose
     DESTINATION bin CONFIGURATIONS Debug
     )
 
-
-# install pymoose bdist.
-install(DIRECTORY ${PYMOOSE_BDIST_INSTALL_DIR}/
+# install pymoose bdist. The bdist comes with predefined /usr; remove it. 
+install(DIRECTORY ${PYMOOSE_BDIST_INSTALL_DIR}/usr/
     DESTINATION ${CMAKE_INSTALL_PREFIX}
     CONFIGURATIONS Release
     )

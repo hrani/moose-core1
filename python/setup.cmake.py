@@ -16,11 +16,15 @@ import os
 import sys
 from distutils.core import setup
 
+
 # NOTE: Though setuptool is preferred we use distutils.
 # 1. setuptool normalize VERSION even when it is compatible with PyPI
 # guidelines. This caused havoc on our OBS build.
 from distutils.core import setup
 
+
+# Read version from VERSION created by cmake file. This file must be present for
+# setup.cmake.py to work perfectly.
 script_dir = os.path.dirname( os.path.abspath( __file__ ) )
 
 # Version file must be available. It MUST be written by cmake. Or create
